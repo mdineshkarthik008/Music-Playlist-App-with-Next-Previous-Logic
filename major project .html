@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Music Playlist App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e2f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #f39c12;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #current {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #2ecc71;
+    }
+    #playlist {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .active {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎵 Music Playlist App</h1>
+
+  <div class="controls">
+    <button onclick="previousSong()">⏮️ Previous</button>
+    <button onclick="nextSong()">⏭️ Next</button>
+    <button onclick="showPlaylist()">📜 Show Playlist</button>
+  </div>
+
+  <div id="current">Current Song: None</div>
+
+  <div id="playlist"></div>
+
+  <script>
+    class Song {
+      constructor(title) {
+        this.title = title;
+        this.next = null;
+        this.prev = null;
+      }
+    }
+
+    class Playlist {
+      constructor() {
+        this.head = null;
+        this.tail = null;
+        this.current = null;
+      }
+
+      addSong(title) {
+        const newSong = new Song(title);
+        if (!this.head) {
+          this.head = this.tail = this.current = newSong;
+        } else {
+          this.tail.next = newSong;
+          newSong.prev = this.tail;
+          this.tail = newSong;
+        }
+      }
+
+      next() {
+        if (this.current && this.current.next) {
+          this.current = this.current.next;
+        } else {
+          alert("You're at the last song.");
+        }
+      }
+
+      prev() {
+        if (this.current && this.current.prev) {
+          this.current = this.current.prev;
+        } else {
+          alert("You're at the first song.");
+        }
+      }
+
+      getCurrent() {
+        return this.current ? this.current.title : 'None';
+      }
+
+      getSongs() {
+        let songs = [];
+        let temp = this.head;
+        while (temp) {
+          songs.push(temp);
+          temp = temp.next;
+        }
+        return songs;
+      }
+    }
+
+    const playlist = new Playlist();
+    const songs = [
+      "Believer", "Shape of You", "Blinding Lights", "Faded", "Levitating",
+      "Senorita", "Perfect", "Closer", "Peaches", "Stay", "Despacito", "Night Changes"
+    ];
+    songs.forEach(title => playlist.addSong(title));
+
+    function updateCurrent() {
+      document.getElementById("current").textContent = "Current Song: " + playlist.getCurrent();
+    }
+
+    function showPlaylist() {
+      const list = playlist.getSongs();
+      let html = "<h3>Playlist:</h3><ul>";
+      list.forEach(song => {
+        const isCurrent = (song === playlist.current);
+        html += `<li class="${isCurrent ? 'active' : ''}">${song.title}</li>`;
+      });
+      html += "</ul>";
+      document.getElementById("playlist").innerHTML = html;
+    }
+
+    function nextSong() {
+      playlist.next();
+      updateCurrent();
+      showPlaylist();
+    }
+
+    function previousSong() {
+      playlist.prev();
+      updateCurrent();
+      showPlaylist();
+    }
+
+    // Initialize UI
+    updateCurrent();
+    showPlaylist();
+  </script>
+
+</body>
+</html>
